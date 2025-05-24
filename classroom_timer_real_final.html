@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>教室タイマー</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; text-align: center; }
+    h1 { font-size: 24px; margin-bottom: 20px; }
+    .button { padding: 20px; font-size: 18px; margin: 10px auto; width: 90%; max-width: 400px; border-radius: 12px; border: none; color: white; display: block; }
+    .btn0 { background: orange; }
+    .btn1 { background: forestgreen; }
+    .btn2 { background: blueviolet; }
+    .btn3 { background: gray; }
+    .active { border: 4px solid black; }
+    .summary, .history { margin-top: 30px; font-size: 16px; text-align: left; white-space: pre-wrap; max-width: 600px; margin-left: auto; margin-right: auto; }
+    button.control { margin: 10px; padding: 10px 20px; font-size: 16px; }
+  </style>
+</head>
+<body>
+  <h1>教室タイマー</h1>
+  <div id="buttons"></div>
+  <div class="summary">
+    <p>合計時間：<span id="totalTime">0:00</span></p>
+    <div id="details"></div>
+    <button class="control" onclick="saveRecord()">記録する</button>
+    <button class="control" onclick="clearHistory()">記録をすべて消す</button>
+  </div>
+  <div class="history">
+    <h2>記録履歴</h2>
+    <div id="historyLog"></div>
+  </div>
+  <script>
+    const labels = ["説明・発問・指示", "活動", "あいまい", "その他"];
+    let times = [0, 0, 0, 0];
+    let active = null;
+    let lastTime = null;
+
+    function format(ms) {
+      const s = Math.floor(ms / 1000);
+      const m = Math.floor(s / 60);
+      return `${m}:${(s % 60).toString().padStart(2, '0')}`;
+    }
+
+    function render() {
+      const total = times.reduce((a, b) => a + b, 0);
+      document.getElementById('totalTime').textContent = format(total);
+      const d = document.getElementById('details');
+      d.innerHTML = labels.map((l, i) => {
+        const pct = total ? ((times[i] / total) * 100).toFixed(1) : 0;
+        return `${l}：${format(times[i])}（${pct}%）`;
+      }).join('\n');
+    }
+
+    function update() {
+      if (active !== null) {
+        const now = Date.now();
+        times[active] += now - lastTime;
+        lastTime = now;
+        render();
+      }
+    }
+
+    setInterval(update, 1000);
+
+    const container = document.getElementById('buttons');
+    labels.forEach((l, i) => {
+      const btn = document.createElement('button');
+      btn.textContent = l;
+      btn.className = `button btn${i}`;
+      btn.onclick = () => {
+        document.querySelectorAll('.button').forEach(b => b.classList.remove('active'));
+        if (active === i) {
+          active = null;
+        } else {
+          active = i;
+          lastTime = Date.now();
+          btn.classList.add('active');
+        }
+      };
+      container.appendChild(btn);
+    });
+
+    function saveRecord() {
+      const now = new Date();
+      const dateStr = now.toLocaleDateString();
+      const timeStr = now.toLocaleTimeString();
+      const total = times.reduce((a, b) => a + b, 0);
+      const lines = labels.map((l, i) => {
+        const pct = total ? ((times[i] / total) * 100).toFixed(1) : 0;
+        return `${l}：${format(times[i])}（${pct}%）`;
+      });
+      const record = `${dateStr} ${timeStr}\n${lines.join('\n')}\n`;
+      const existing = localStorage.getItem('history') || '';
+      localStorage.setItem('history', record + existing);
+      loadHistory();
+    }
+
+    function loadHistory() {
+      const log = localStorage.getItem('history') || '';
+      document.getElementById('historyLog').textContent = log;
+    }
+
+    function clearHistory() {
+      localStorage.removeItem('history');
+      loadHistory();
+    }
+
+    loadHistory();
+    render();
+  </script>
+</body>
+</html>
