@@ -2,6 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
+  <link rel="manifest" href="manifest.json">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>教室タイマー</title>
   <style>
@@ -31,6 +32,9 @@
     <div id="historyLog"></div>
   </div>
   <script>
+    if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js');
+}
     const labels = ["説明・発問・指示", "活動", "あいまい", "その他"];
     let times = [0, 0, 0, 0];
     let active = null;
