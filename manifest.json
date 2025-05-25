@@ -1,6 +1,6 @@
 {
-  "name": "教室タイマー",
-  "short_name": "タイマー",
+  "name": "授業タイマー",
+  "short_name": 授業",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",
