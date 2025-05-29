@@ -113,5 +113,33 @@
     loadHistory();
     render();
   </script>
+</script>
+
+<!-- ここに貼り付けてOK！ -->
+<!-- ℹ️ 情報ボタン -->
+<button onclick="document.getElementById('infoModal').style.display='block'" style="position:fixed; bottom:20px; right:20px; font-size:1.2em;">ℹ️</button>
+
+<!-- モーダル内容 -->
+<div id="infoModal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:#fff; padding:20px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.3); max-width:90%; width:400px; z-index:999;">
+  <h2 style="margin-top:0;">このアプリについて</h2>
+  <p>本アプリは、OpenAIのChatGPTとの対話を通じて作成された、授業用のカウントアップタイマーです。</p>
+  <ul style="padding-left: 1.2em;">
+    <li>非営利・教育目的での利用を想定しています。</li>
+    <li>利用はご自身の責任でお願いします。</li>
+    <li>著作権は制作者に帰属します。</li>
+    <li>カウントアップ方式（経過時間の表示）で時間を測定します。</li>
+    <li>本アプリには現在、音声機能は搭載されていません。</li>
+    <li>終了音などはなく、画面表示で確認する仕様です。</li>
+    <li>【リセット方法】Web版ではページを再読み込みするとタイマーがリセットされます。</li>
+    <li>PWA（スマホに追加したアプリ版）では、一度閉じて再度開くことでリセット可能です。</li>
+    <li>本アプリはPWA（Progressive Web App）に対応しており、ホーム画面から起動でき、オフラインでも動作します。</li>
+  </ul>
+  <div style="text-align:right; margin-top:10px;">
+    <button onclick="document.getElementById('infoModal').style.display='none'" style="padding:5px 10px;">閉じる</button>
+  </div>
+</div>
+
+</body>
+</html>
 </body>
 </html>
