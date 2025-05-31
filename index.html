@@ -85,30 +85,63 @@
       container.appendChild(btn);
     });
 
-    function saveRecord() {
-      const now = new Date();
-      const dateStr = now.toLocaleDateString();
-      const timeStr = now.toLocaleTimeString();
-      const total = times.reduce((a, b) => a + b, 0);
-      const lines = labels.map((l, i) => {
-        const pct = total ? ((times[i] / total) * 100).toFixed(1) : 0;
-        return `${l}：${format(times[i])}（${pct}%）`;
-      });
-      const record = `${dateStr} ${timeStr}\n${lines.join('\n')}\n`;
-      const existing = localStorage.getItem('history') || '';
+function saveRecord() {
+  const now = new Date();
+  const dateStr = now.toLocaleDateString();
+  const timeStr = now.toLocaleTimeString();
+  const total = times.reduce((a, b) => a + b, 0);
+  const lines = labels.map((l, i) => {
+    const pct = total ? ((times[i] / total) * 100).toFixed(1) : 0;
+    return `${l}：${format(times[i])}（${pct}%）`;
+  });
+
+  const record = {
+    timestamp: `${dateStr} ${timeStr}`,
+    lines: lines,
+    locked: false
+  };
+
+  const history = JSON.parse(localStorage.getItem('history') || '[]');
+  history.unshift(record);
+  localStorage.setItem('history', JSON.stringify(history));
+  loadHistory();
+}
       localStorage.setItem('history', record + existing);
       loadHistory();
     }
 
-    function loadHistory() {
-      const log = localStorage.getItem('history') || '';
-      document.getElementById('historyLog').textContent = log;
-    }
+function loadHistory() {
+  const history = JSON.parse(localStorage.getItem('history') || '[]');
+  const log = document.getElementById('historyLog');
+  log.innerHTML = "";
 
-    function clearHistory() {
-      localStorage.removeItem('history');
+  history.forEach((item, index) => {
+    const div = document.createElement("div");
+    div.style.border = "1px solid #ccc";
+    div.style.padding = "10px";
+    div.style.marginBottom = "10px";
+    div.style.backgroundColor = item.locked ? "#eee" : "#fff";
+
+    div.innerHTML = `<strong>${item.timestamp}</strong><br>${item.lines.join('<br>')}<br>`;
+
+    const lockBtn = document.createElement("button");
+    lockBtn.textContent = item.locked ? "🔒 ロック中" : "🔓 ロック";
+    lockBtn.onclick = () => {
+      item.locked = !item.locked;
+      localStorage.setItem('history', JSON.stringify(history));
       loadHistory();
-    }
+    };
+
+    div.appendChild(lockBtn);
+    log.appendChild(div);
+  });
+}
+function clearHistory() {
+  const history = JSON.parse(localStorage.getItem('history') || '[]');
+  const kept = history.filter(item => item.locked);
+  localStorage.setItem('history', JSON.stringify(kept));
+  loadHistory();
+}
 
     loadHistory();
     render();
@@ -119,6 +152,7 @@
 <!-- ℹ️ 情報ボタン -->
 <button onclick="document.getElementById('infoModal').style.display='block'" style="position:fixed; bottom:20px; right:20px; font-size:1.2em;">ℹ️</button>
 
+<!-- モーダル内容 -->
 <!-- モーダル内容 -->
 <div id="infoModal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:#fff; padding:20px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.3); max-width:90%; width:400px; z-index:999; text-align:left;">
   <h2 style="margin-top:0;">このアプリについて</h2>
@@ -133,6 +167,8 @@
     <li>【リセット方法】Web版ではページを再読み込みするとタイマーがリセットされます。</li>
     <li>PWA（スマホに追加したアプリ版）では、一度閉じて再度開くことでリセット可能です。</li>
     <li>本アプリはPWA（Progressive Web App）に対応しており、ホーム画面から起動でき、オフラインでも動作します。</li>
+    <li><strong>記録ごとに「🔓 ロック」ボタンで保護できます。ロック中は「記録をすべて消す」を押しても消去されません。</strong></li>
+    <li>ロック状態の記録は背景がグレーで表示され、安心して残しておけます。</li>
   </ul>
   <div style="text-align:right; margin-top:10px;">
     <button onclick="document.getElementById('infoModal').style.display='none'" style="padding:5px 10px;">閉じる</button>
