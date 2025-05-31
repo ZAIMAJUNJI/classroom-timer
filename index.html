@@ -105,9 +105,6 @@ function saveRecord() {
   history.unshift(record);
   localStorage.setItem('history', JSON.stringify(history));
   loadHistory();
-}
-      localStorage.setItem('history', record + existing);
-      loadHistory();
     }
 
 function loadHistory() {
@@ -145,7 +142,6 @@ function clearHistory() {
 
     loadHistory();
     render();
-  </script>
 </script>
 
 <!-- ここに貼り付けてOK！ -->
